@@ -23,13 +23,20 @@ $age=$diff->format('%y');
     //    die('All fields are required.');
     }
  
-    $sql = "UPDATE users SET name=?, password=?, date_of_birth=?, contact_number=?, age=? WHERE username=?";
-$stmt= $pdo->prepare($sql);
-$stmt->execute([$name,$password,$dob, $contact_number, $age, $username]);
+    $statement = $pdo->prepare('INSERT INTO users (username, password, name, date_of_birth, contact_number,age)  
+    VALUES (:user,:pwd,:fname,:dob,:contact,:age)');
 
-     
-echo 'Updated successfuly.';
- 
+$statement->execute([
+    'user' => $username,
+    'pwd' => $password,
+
+    'fname' => $name,
+    'dob' => $dob,
+    'contact' => $contact_number,
+    'age' => $age,
+
+]);
+echo 'Registration successful.';
    
     
 }
