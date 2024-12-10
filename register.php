@@ -1,43 +1,34 @@
 <?php
  
 //require_once 'redis_config.php';
- require_once '../php/db_config.php';
- 
-if ($_REQUEST['username']) {
+echo $_POST['username'];
+require_once 'db_config.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    
-    $username = $_REQUEST['username'] ?? '';
+    $username = $_POST['username'] ?? '';
    
-    $password = $_REQUEST['password'] ?? '';
-    $name = $_REQUEST['name'] ?? '';
-    $dob = $_REQUEST['dob'] ?? '';
-    $contact_number = $_REQUEST['contact'] ?? '';
-    $age='';
-if($dob !='')
-{
-    $today=date("Y-m-d");
-    $diff = date_diff(date_create($dob), date_create($today));
-$age=$diff->format('%y');
+    $password = $_POST['password'] ?? '';
+    $name = $_POST['name'] ?? '';
+    $dob = $_POST['date_of_birth'] ?? '';
+    $contact_number = $_POST['contact_number'] ?? '';
 
-}
-    if (!$username || !$password || !$name || !$dob || !$contact_number) {
-    //    die('All fields are required.');
-    }
- 
-    $statement = $pdo->prepare('INSERT INTO users (username, password, name, date_of_birth, contact_number,age)  
-    VALUES (:user,:pwd,:fname,:dob,:contact,:age)');
-
-$statement->execute([
-    'user' => $username,
-    'pwd' => $password,
-
-    'fname' => $name,
-    'dob' => $dob,
-    'contact' => $contact_number,
-    'age' => $age,
-
-]);
-echo 'Registration successful.';
-   
     
+    if (!$username || !$password || !$name || !$dob || !$contact_number) {
+        die('All fields are required.');
+    }
+
+    $query = "INSERT INTO users (username, password, name, date_of_birth, contact_number) VALUES (?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('sssss', $username, $password, $name, $dob, $contact_number);
+
+    if ($stmt->execute()) {
+        echo 'Registration successful.';
+    } else {
+        echo 'Error: ' . $stmt->error;
+    }
+
+    $stmt->close();
+    $conn->close();
 }
 ?>
